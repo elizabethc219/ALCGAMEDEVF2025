@@ -5,64 +5,73 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     [Header("Enemy Stats")]
-    public float moveSpeed; //how fast enemy moves
-    public Vector3 moveOffset; //Enemy direction
-    private Vector3 startPos; //Start position
-    private Vector3 targetPos; //Target position
 
-    //start is called before the first frame update
+    public float moveSpeed; // How fast the enemy will move
+    public Vector3 moveOffset; // Enemy Direction
+    private Vector3 startPos; // Start Position
+    private Vector3 targetPos; // Target Position
 
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         startPos = transform.position;
         targetPos = startPos;
     }
-    //update is called once per frame
+
+    // Update is called once per frame
     void Update()
     {
+        // Move towards the target position
         transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
+
+        //Are we at the target position
         if (transform.position == targetPos)
         {
-            if (transform.position == startPos)
+            //Missing if statement here. Fix this please!
+
+            // Is our target pos our start pos? If so, set it to be the other one
+            if(targetPos == startPos) // Originally if(target.position == start.position)
             {
                 targetPos = startPos + moveOffset;
             }
-            //otherwise do else
             else
             {
                 targetPos = startPos;
             }
-
         }
+        // Otherwise, do the opposite.
+        
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+private void OnTriggerEnter2D(Collider2D collision)
+{
+    //Did the player hit us?
+    if(collision.CompareTag("Player"))
     {
-        //did the player hit us?
-        if(collision.CompareTag("Player"))
-        {
-            //start the game over
-            collision.GetComponent<PlayController2D>().GameOver();
-        }
+        //Trigger the game over state on the player
+        collision.GetComponent<PlayController2D>().GameOver();
     }
+}
 
-    private void OnDrawGizmos()
+private void OnDrawGizmos()
+{
+    Vector3 from;
+    Vector3 to;
+
+    if(Application.isPlaying)
     {
-        Vector3 from;
-        Vector3 to;
-        if (Application.isPlaying)
-        {
-            from = startPos;
-        }
-        else
-        {
-            from = transform.position;
-        }
-        to = from = moveOffset;
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(from, to);
-        Gizmos.DrawWireSphere(to, 0.2f);
-        Gizmos.DrawWireSphere(from, 0.2f);
+        from = startPos;
     }
+    else
+    {
+        from = transform.position;
+    }
+
+    to = from = moveOffset;
+
+    Gizmos.color = Color.red;
+    Gizmos.DrawLine(from, to);
+    Gizmos.DrawWireSphere(to, 0.2f);
+    Gizmos.DrawWireSphere(from, 0.2f);
+}
 }
